@@ -1,5 +1,4 @@
 # tech-feed
-# 📡 tech-intel-feed
 
 A dark, terminal-style web viewer for my daily tech intel briefs.
 
