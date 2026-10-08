@@ -5,7 +5,7 @@ A dark, terminal-style web viewer for my daily tech intel briefs.
 Paste the HTML/CSS that ChatGPT generates, hit **run / render**, and read it.
 Save each day's brief to a dated list and reopen it any time.
 
-🔗 **Live demo:** https://naveenraj1513.github.io/tech-intel-feed/
+🔗 **Live demo:** https://naveenraj1513.github.io/tech-feed/
 
 ## ✨ Features
 
