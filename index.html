@@ -1,1 +1,1982 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 
+<title>Daily Brief Viewer</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+
+:root{
+  box-sizing:border-box;
+
+  --bg:#07060f;
+  --card:#0e0b1c;
+  --card2:#111022;
+  --ink:#e8e9f7;
+  --mute:#777b9e;
+  --line:#282341;
+
+  --acc:#00f0ff;
+  --acc2:#ff2bd6;
+  --warn:#ffe66d;
+  --accink:#04060f;
+
+  --mono:"JetBrains Mono",ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  --ui:"Inter",system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+
+:root[data-theme="matrix"]{
+  --bg:#020a05;
+  --card:#07130a;
+  --card2:#0b1a0e;
+  --ink:#bff5cf;
+  --mute:#4b7a5a;
+  --line:#0f2a17;
+  --acc:#00ff66;
+  --acc2:#b6ff00;
+  --warn:#ffd60a;
+  --accink:#021208;
+}
+
+:root[data-theme="dracula"]{
+  --bg:#15161f;
+  --card:#1d1f2b;
+  --card2:#232536;
+  --ink:#f8f8f2;
+  --mute:#7a82a8;
+  --line:#2e3146;
+  --acc:#bd93f9;
+  --acc2:#ff79c6;
+  --warn:#f1fa8c;
+  --accink:#14111f;
+}
+
+:root[data-theme="amber"]{
+  --bg:#0c0905;
+  --card:#15100a;
+  --card2:#1b140a;
+  --ink:#ffd9a0;
+  --mute:#8a6a3a;
+  --line:#2e2210;
+  --acc:#ffb000;
+  --acc2:#ff5a1f;
+  --warn:#ffe08a;
+  --accink:#130b00;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html{
+  scroll-padding-top:env(safe-area-inset-top,0px);
+}
+
+body{
+  margin:0;
+  color:var(--ink);
+  font:14px/1.6 var(--ui);
+
+  background-color:var(--bg);
+
+  background-image:
+    radial-gradient(
+      circle at 8% -8%,
+      color-mix(in srgb,var(--acc2) 24%,transparent),
+      transparent 42%
+    ),
+    radial-gradient(
+      circle at 98% 2%,
+      color-mix(in srgb,var(--acc) 20%,transparent),
+      transparent 38%
+    ),
+    linear-gradient(
+      color-mix(in srgb,var(--acc) 7%,transparent) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      color-mix(in srgb,var(--acc) 7%,transparent) 1px,
+      transparent 1px
+    );
+
+  background-size:auto,auto,32px 32px,32px 32px;
+  background-attachment:fixed;
+}
+
+
+/* =========================
+   HEADER
+========================= */
+
+header{
+  max-width:1300px;
+  margin:0 auto;
+  padding:16px 18px 0;
+}
+
+.term{
+  border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line));
+  box-shadow:0 0 40px -18px var(--acc);
+  background:var(--card);
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.tb{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  padding:8px 12px;
+
+  border-bottom:1px solid var(--line);
+
+  color:var(--mute);
+
+  font:12px var(--mono);
+}
+
+.dot{
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff5f56;
+}
+
+.dot:nth-child(2){
+  background:#ffbd2e;
+}
+
+.dot:nth-child(3){
+  background:#27c93f;
+}
+
+.tb em{
+  margin-left:8px;
+  font-style:normal;
+}
+
+.tbody{
+  padding:15px 16px 17px;
+}
+
+h1{
+  font:800 clamp(20px,4vw,30px)/1.2 var(--mono);
+  margin:0;
+  color:var(--acc);
+}
+
+h1 .pr{
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+}
+
+h1 .cur{
+  display:inline-block;
+  width:.6em;
+  height:1em;
+  background:var(--acc);
+  vertical-align:-.12em;
+  margin-left:4px;
+  animation:bl 1s steps(2) infinite;
+}
+
+@keyframes bl{
+  50%{opacity:0}
+}
+
+.dl{
+  color:var(--mute);
+  font:12px var(--mono);
+  margin-top:6px;
+}
+
+.dl b{
+  color:var(--warn);
+  text-shadow:0 0 8px color-mix(in srgb,var(--warn) 50%,transparent);
+  font-weight:600;
+}
+
+.tools{
+  display:flex;
+  gap:8px;
+  padding:12px 0 0;
+  flex-wrap:wrap;
+}
+
+
+/* =========================
+   BUTTONS
+========================= */
+
+button{
+  font:600 12px var(--mono);
+
+  border:1px solid var(--line);
+
+  background:var(--card);
+  color:var(--ink);
+
+  padding:8px 13px;
+
+  border-radius:6px;
+
+  cursor:pointer;
+
+  transition:
+    border-color .2s ease,
+    color .2s ease,
+    box-shadow .2s ease,
+    transform .15s ease;
+}
+
+button:before{
+  content:"[ ";
+}
+
+button:after{
+  content:" ]";
+}
+
+button:hover{
+  border-color:var(--acc);
+  color:var(--acc);
+  box-shadow:0 0 12px -4px var(--acc);
+}
+
+button:active{
+  transform:translateY(1px);
+}
+
+button.p{
+  background:linear-gradient(90deg,var(--acc),var(--acc2));
+  color:var(--accink);
+  border-color:transparent;
+
+  box-shadow:0 0 18px -6px var(--acc2);
+}
+
+button.p:hover{
+  color:var(--accink);
+  filter:brightness(1.1);
+}
+
+.x:before,
+.x:after{
+  content:"";
+}
+
+
+/* =========================
+   MAIN LAYOUT
+========================= */
+
+.wrap{
+  display:grid;
+  grid-template-columns:250px 1fr;
+
+  gap:16px;
+
+  padding:16px 18px 30px;
+
+  max-width:1300px;
+  margin:0 auto;
+}
+
+
+/* =========================
+   SIDEBAR
+========================= */
+
+aside{
+  border:1px solid var(--line);
+  background:var(--card);
+
+  border-radius:8px;
+
+  align-self:start;
+
+  max-height:75vh;
+  overflow:auto;
+
+  padding:12px;
+}
+
+aside h2{
+  font:600 12px var(--mono);
+  color:var(--acc2);
+
+  margin:0 0 8px;
+
+  text-shadow:0 0 10px var(--acc2);
+}
+
+aside h2:before{
+  content:"$ ls ";
+}
+
+.item{
+  display:flex;
+  align-items:center;
+  gap:6px;
+
+  padding:7px 8px;
+
+  border-radius:5px;
+
+  cursor:pointer;
+
+  font:12.5px var(--mono);
+
+  color:var(--ink);
+
+  transition:.15s ease;
+}
+
+.item:before{
+  content:"▸";
+  color:var(--mute);
+}
+
+.item:hover{
+  background:var(--bg);
+  color:var(--acc);
+}
+
+.item.on{
+  background:color-mix(in srgb,var(--acc) 10%,transparent);
+  color:var(--acc);
+  box-shadow:inset 2px 0 var(--acc2);
+}
+
+.item.on:before{
+  content:"▶";
+  color:var(--acc);
+}
+
+.item span{
+  flex:1;
+  min-width:0;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+}
+
+.item .x{
+  border:0;
+  background:none;
+  color:var(--mute);
+  padding:0 4px;
+}
+
+.item .x:hover{
+  color:#ff5f56;
+  box-shadow:none;
+}
+
+.empty{
+  color:var(--mute);
+  padding:4px 0;
+  font:12px var(--mono);
+}
+
+.empty:before{
+  content:"# ";
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+main{
+  min-width:0;
+}
+
+.bar{
+  display:flex;
+
+  gap:8px;
+
+  margin-bottom:10px;
+
+  flex-wrap:wrap;
+
+  align-items:center;
+}
+
+
+/* =========================
+   TITLE / DATE
+========================= */
+
+.bar input[type=text]{
+  flex:1;
+  min-width:140px;
+
+  font:500 14px var(--ui);
+
+  padding:10px 12px;
+
+  border:1px solid var(--line);
+
+  border-radius:7px;
+
+  background:var(--card);
+
+  color:var(--ink);
+
+  transition:.2s ease;
+}
+
+.bar input[type=text]:focus{
+  outline:0;
+
+  border-color:var(--acc);
+
+  box-shadow:0 0 12px -4px var(--acc);
+}
+
+.bar input::placeholder{
+  color:var(--mute);
+}
+
+
+/* =========================
+   CHATGPT-STYLE PASTE EDITOR
+========================= */
+
+.editor-shell{
+  position:relative;
+
+  background:
+    linear-gradient(
+      145deg,
+      color-mix(in srgb,var(--card2) 96%,transparent),
+      var(--card)
+    );
+
+  border:1px solid var(--line);
+
+  border-radius:14px;
+
+  box-shadow:
+    0 10px 35px rgba(0,0,0,.18),
+    inset 0 1px 0 rgba(255,255,255,.025);
+
+  overflow:hidden;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.editor-shell:hover{
+  border-color:
+    color-mix(in srgb,var(--acc) 35%,var(--line));
+}
+
+.editor-shell.focused{
+  border-color:
+    color-mix(in srgb,var(--acc) 75%,var(--line));
+
+  box-shadow:
+    0 0 0 1px color-mix(in srgb,var(--acc) 20%,transparent),
+    0 0 30px -15px var(--acc);
+}
+
+.editor-top{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  padding:11px 14px;
+
+  border-bottom:1px solid var(--line);
+
+  background:
+    color-mix(in srgb,var(--card2) 90%,transparent);
+}
+
+.editor-label{
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+
+  color:var(--mute);
+
+  font:500 11px var(--mono);
+
+  text-transform:uppercase;
+
+  letter-spacing:.05em;
+}
+
+.editor-label .status{
+  width:7px;
+  height:7px;
+
+  border-radius:50%;
+
+  background:var(--acc);
+
+  box-shadow:0 0 8px var(--acc);
+}
+
+.editor-actions{
+  display:flex;
+  gap:6px;
+}
+
+.mini-btn{
+  border:1px solid var(--line);
+
+  background:transparent;
+
+  color:var(--mute);
+
+  font:500 11px var(--ui);
+
+  padding:5px 9px;
+
+  border-radius:6px;
+}
+
+.mini-btn:before,
+.mini-btn:after{
+  content:"";
+}
+
+.mini-btn:hover{
+  color:var(--acc);
+
+  border-color:
+    color-mix(in srgb,var(--acc) 55%,var(--line));
+
+  box-shadow:none;
+}
+
+textarea{
+  width:100%;
+
+  height:50vh;
+
+  min-height:350px;
+
+  display:block;
+
+  border:0;
+
+  outline:0;
+
+  resize:vertical;
+
+  padding:20px;
+
+  background:transparent;
+
+  color:var(--ink);
+
+  caret-color:var(--acc);
+
+  font:
+    14px/1.7
+    var(--ui);
+
+  letter-spacing:-.01em;
+}
+
+textarea::placeholder{
+  color:var(--mute);
+
+  opacity:.75;
+}
+
+textarea:focus{
+  outline:0;
+  box-shadow:none;
+}
+
+.editor-bottom{
+  display:flex;
+
+  align-items:center;
+
+  justify-content:space-between;
+
+  gap:10px;
+
+  padding:9px 13px;
+
+  border-top:1px solid var(--line);
+
+  color:var(--mute);
+
+  font:11px var(--mono);
+}
+
+.editor-bottom-left{
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.drop-active{
+  border-color:var(--acc)!important;
+
+  box-shadow:
+    0 0 30px -8px var(--acc),
+    inset 0 0 30px -20px var(--acc);
+}
+
+.char-count{
+  color:var(--mute);
+}
+
+.char-count b{
+  color:var(--acc);
+}
+
+
+/* =========================
+   RENDER VIEW
+========================= */
+
+.frame{
+  background:#fff;
+
+  border:1px solid var(--acc);
+
+  border-radius:6px;
+
+  overflow:hidden;
+
+  box-shadow:
+    0 0 28px -8px var(--acc),
+    0 0 46px -14px var(--acc2);
+}
+
+iframe{
+  width:100%;
+  height:78vh;
+
+  border:0;
+
+  display:block;
+
+  background:#fff;
+}
+
+.frame.full{
+  position:fixed;
+
+  inset:0;
+
+  z-index:9;
+
+  border-radius:0;
+
+  padding-top:env(safe-area-inset-top,0px);
+}
+
+.frame.full iframe{
+  height:100%;
+}
+
+.hint{
+  color:var(--mute);
+
+  font:11px/1.5 var(--mono);
+
+  margin:10px 2px;
+}
+
+.hint:before{
+  content:"// ";
+}
+
+.hide{
+  display:none;
+}
+
+
+/* =========================
+   TOAST
+========================= */
+
+.toast{
+  position:fixed;
+
+  left:50%;
+
+  bottom:25px;
+
+  transform:
+    translate(-50%,20px);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  z-index:100;
+
+  padding:10px 16px;
+
+  border:1px solid var(--acc);
+
+  border-radius:8px;
+
+  background:var(--card);
+
+  color:var(--acc);
+
+  font:12px var(--mono);
+
+  box-shadow:
+    0 0 25px -8px var(--acc);
+
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+.toast.show{
+  opacity:1;
+
+  transform:
+    translate(-50%,0);
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
+
+@media(max-width:760px){
+
+  .wrap{
+    grid-template-columns:1fr;
+  }
+
+  aside{
+    max-height:none;
+  }
+
+  textarea{
+    height:55vh;
+    min-height:300px;
+    padding:16px;
+
+    font-size:13px;
+  }
+
+  .editor-top{
+    padding:10px 11px;
+  }
+
+  .editor-bottom{
+    flex-direction:column;
+    align-items:flex-start;
+  }
+
+}
+
+@media(max-width:480px){
+
+  header{
+    padding:10px 10px 0;
+  }
+
+  .wrap{
+    padding:10px 10px 25px;
+  }
+
+  .tbody{
+    padding:13px;
+  }
+
+  h1{
+    font-size:19px;
+  }
+
+  .tools button{
+    flex:1;
+  }
+
+  .bar input[type=text]{
+    width:100%;
+    flex-basis:100%;
+  }
+
+  .editor-actions{
+    display:none;
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+<header>
+
+  <div class="term">
+
+    <div class="tb">
+      <i class="dot"></i>
+      <i class="dot"></i>
+      <i class="dot"></i>
+
+      <em>daily-brief — zsh</em>
+    </div>
+
+    <div class="tbody">
+
+      <h1>
+        <span class="pr">~/daily-brief $</span>
+        ./read --today
+        <span class="cur"></span>
+      </h1>
+
+      <div class="dl">
+        date=<b id="dd"></b>
+        &nbsp;|&nbsp;
+        briefs=<b id="cnt">0</b>
+        &nbsp;|&nbsp;
+        src=chatgpt
+        &nbsp;|&nbsp;
+        storage=local
+      </div>
+
+      <div class="tools">
+
+        <button id="new" class="p">
+          paste today's brief
+        </button>
+
+        <button id="theme">
+          theme: cyber
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</header>
+
+
+<div class="wrap">
+
+  <!-- ================= SIDEBAR ================= -->
+
+  <aside>
+
+    <h2>briefs/</h2>
+
+    <div id="list"></div>
+
+  </aside>
+
+
+  <!-- ================= MAIN ================= -->
+
+  <main>
+
+    <!-- ================= EDITOR ================= -->
+
+    <section id="edit">
+
+      <div class="bar">
+
+        <input
+          type="text"
+          id="title"
+          placeholder="Title  e.g. ai-news"
+        >
+
+        <input
+          type="text"
+          id="date"
+          style="max-width:170px"
+          aria-label="Date"
+        >
+
+      </div>
+
+
+      <div class="editor-shell" id="editorShell">
+
+        <div class="editor-top">
+
+          <div class="editor-label">
+
+            <span class="status"></span>
+
+            <span>Paste HTML Brief</span>
+
+          </div>
+
+          <div class="editor-actions">
+
+            <button
+              class="mini-btn"
+              id="pasteBtn"
+              type="button"
+            >
+              Paste
+            </button>
+
+            <button
+              class="mini-btn"
+              id="loadFile"
+              type="button"
+            >
+              Open HTML
+            </button>
+
+            <input
+              type="file"
+              id="fileInput"
+              accept=".html,.htm,text/html"
+              hidden
+            >
+
+          </div>
+
+        </div>
+
+
+        <textarea
+          id="code"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="Paste the HTML news brief here...
+
+You can paste the complete HTML generated by ChatGPT.
+
+Example:
+
+<!DOCTYPE html>
+<html>
+<head>
+  ...
+</head>
+<body>
+  Your daily news...
+</body>
+</html>
+
+You can also drag & drop an .html file here."
+        ></textarea>
+
+
+        <div class="editor-bottom">
+
+          <div class="editor-bottom-left">
+
+            <span>
+              HTML
+            </span>
+
+            <span>
+              •
+            </span>
+
+            <span id="editorStatus">
+              Ready
+            </span>
+
+          </div>
+
+          <div class="char-count">
+            <b id="charCount">0</b> characters
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div class="bar" style="margin-top:10px">
+
+        <button
+          id="show"
+          class="p"
+        >
+          run / render
+        </button>
+
+        <button id="save">
+          save
+        </button>
+
+        <button id="clear">
+          clear
+        </button>
+
+      </div>
+
+
+      <p class="hint">
+        Paste the complete HTML generated by ChatGPT. Markdown code fences are automatically removed.
+      </p>
+
+    </section>
+
+
+    <!-- ================= VIEW ================= -->
+
+    <section
+      id="view"
+      class="hide"
+    >
+
+      <div class="bar">
+
+        <button id="back">
+          back to editor
+        </button>
+
+        <button id="savev">
+          save
+        </button>
+
+        <button id="full">
+          fullscreen
+        </button>
+
+        <span
+          id="vt"
+          class="hint"
+          style="margin:0"
+        ></span>
+
+      </div>
+
+
+      <div
+        class="frame"
+        id="frame"
+      >
+
+        <iframe
+          id="fr"
+          sandbox="allow-scripts allow-popups"
+          title="Brief"
+        ></iframe>
+
+      </div>
+
+
+      <p class="hint">
+        Remote images or fonts inside the pasted code may be blocked on this hosted page. If so, download this page and open it from your computer, where they will load.
+      </p>
+
+    </section>
+
+  </main>
+
+</div>
+
+
+<div
+  id="toast"
+  class="toast"
+></div>
+
+
+<script>
+
+(function(){
+
+  var KEY="dailyBriefs.v1";
+  var THEME="dailyBriefs.theme";
+
+  var $=function(i){
+    return document.getElementById(i);
+  };
+
+  var items=[];
+  var current=null;
+
+
+  /* =========================
+     STORAGE
+  ========================= */
+
+  function load(){
+
+    try{
+
+      items=
+        JSON.parse(
+          localStorage.getItem(KEY)||"[]"
+        )||[];
+
+    }catch(e){
+
+      items=[];
+
+    }
+
+  }
+
+
+  function persist(){
+
+    try{
+
+      localStorage.setItem(
+        KEY,
+        JSON.stringify(items)
+      );
+
+      return true;
+
+    }catch(e){
+
+      alert(
+        "Could not save in this browser."
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  /* =========================
+     DATE
+  ========================= */
+
+  function today(){
+
+    var d=new Date();
+
+    return d.getFullYear()
+      +"-"
+      +String(d.getMonth()+1).padStart(2,"0")
+      +"-"
+      +String(d.getDate()).padStart(2,"0");
+
+  }
+
+
+  /* =========================
+     CLEAN HTML
+  ========================= */
+
+  function clean(s){
+
+    s=s.trim();
+
+    var m=s.match(
+      /```[a-zA-Z]*\s*\n([\s\S]*?)```/
+    );
+
+    if(m){
+
+      s=m[1].trim();
+
+    }
+
+    return s;
+
+  }
+
+
+  /* =========================
+     TOAST
+  ========================= */
+
+  var toastTimer;
+
+  function toast(message){
+
+    var t=$("toast");
+
+    t.textContent=message;
+
+    t.classList.add("show");
+
+    clearTimeout(toastTimer);
+
+    toastTimer=setTimeout(function(){
+
+      t.classList.remove("show");
+
+    },1800);
+
+  }
+
+
+  /* =========================
+     SIDEBAR
+  ========================= */
+
+  function render(){
+
+    $("cnt").textContent=items.length;
+
+    var l=$("list");
+
+    l.innerHTML="";
+
+
+    if(!items.length){
+
+      l.innerHTML=
+        '<div class="empty">no briefs saved yet</div>';
+
+      return;
+
+    }
+
+
+    items
+      .slice()
+      .sort(function(a,b){
+
+        return b.date<a.date
+          ?-1
+          :b.date>a.date
+          ?1
+          :b.ts-a.ts;
+
+      })
+      .forEach(function(it){
+
+        var d=
+          document.createElement("div");
+
+        d.className=
+          "item"
+          +(current===it.id?" on":"");
+
+
+        var s=
+          document.createElement("span");
+
+        s.textContent=
+          it.date+" · "+it.title;
+
+
+        var x=
+          document.createElement("button");
+
+        x.className="x";
+
+        x.textContent="✕";
+
+        x.title="Delete";
+
+
+        x.onclick=function(e){
+
+          e.stopPropagation();
+
+          if(
+            confirm(
+              "Delete this brief?"
+            )
+          ){
+
+            items=
+              items.filter(function(i){
+
+                return i.id!==it.id;
+
+              });
+
+
+            if(current===it.id){
+
+              current=null;
+
+            }
+
+            persist();
+
+            render();
+
+            toast("Brief deleted");
+
+          }
+
+        };
+
+
+        d.onclick=function(){
+
+          current=it.id;
+
+          $("title").value=it.title;
+
+          $("date").value=it.date;
+
+          $("code").value=it.code;
+
+          updateCount();
+
+          show();
+
+          render();
+
+        };
+
+
+        d.appendChild(s);
+
+        d.appendChild(x);
+
+        l.appendChild(d);
+
+      });
+
+  }
+
+
+  /* =========================
+     UPDATE CHARACTER COUNT
+  ========================= */
+
+  function updateCount(){
+
+    var value=$("code").value;
+
+    $("charCount").textContent=
+      value.length.toLocaleString();
+
+    $("editorStatus").textContent=
+      value.trim()
+      ?"Ready to render"
+      :"Waiting for HTML";
+
+  }
+
+
+  $("code").addEventListener(
+    "input",
+    updateCount
+  );
+
+
+  /* =========================
+     EDITOR FOCUS
+  ========================= */
+
+  $("code").addEventListener(
+    "focus",
+    function(){
+
+      $("editorShell")
+        .classList.add("focused");
+
+    }
+  );
+
+
+  $("code").addEventListener(
+    "blur",
+    function(){
+
+      $("editorShell")
+        .classList.remove("focused");
+
+    }
+  );
+
+
+  /* =========================
+     DRAG DROP
+  ========================= */
+
+  var editor=$("editorShell");
+
+
+  editor.addEventListener(
+    "dragover",
+    function(e){
+
+      e.preventDefault();
+
+      editor.classList.add("drop-active");
+
+    }
+  );
+
+
+  editor.addEventListener(
+    "dragleave",
+    function(){
+
+      editor.classList.remove(
+        "drop-active"
+      );
+
+    }
+  );
+
+
+  editor.addEventListener(
+    "drop",
+    function(e){
+
+      e.preventDefault();
+
+      editor.classList.remove(
+        "drop-active"
+      );
+
+
+      var file=
+        e.dataTransfer.files[0];
+
+
+      if(!file){
+
+        return;
+
+      }
+
+
+      if(
+        !file.name.match(
+          /\.(html?|txt)$/i
+        )
+      ){
+
+        toast(
+          "Please drop an HTML file"
+        );
+
+        return;
+
+      }
+
+
+      var reader=
+        new FileReader();
+
+
+      reader.onload=function(){
+
+        $("code").value=
+          reader.result;
+
+        updateCount();
+
+        toast(
+          "HTML file loaded"
+        );
+
+      };
+
+
+      reader.readAsText(file);
+
+    }
+  );
+
+
+  /* =========================
+     PASTE BUTTON
+  ========================= */
+
+  $("pasteBtn").onclick=
+    async function(){
+
+      try{
+
+        var text=
+          await navigator.clipboard.readText();
+
+        if(!text){
+
+          toast("Clipboard is empty");
+
+          return;
+
+        }
+
+        $("code").value=text;
+
+        updateCount();
+
+        toast("HTML pasted");
+
+        $("code").focus();
+
+      }catch(e){
+
+        $("code").focus();
+
+        toast(
+          "Use Ctrl + V to paste"
+        );
+
+      }
+
+    };
+
+
+  /* =========================
+     OPEN HTML FILE
+  ========================= */
+
+  $("loadFile").onclick=function(){
+
+    $("fileInput").click();
+
+  };
+
+
+  $("fileInput").onchange=function(e){
+
+    var file=e.target.files[0];
+
+    if(!file){
+
+      return;
+
+    }
+
+
+    var reader=
+      new FileReader();
+
+
+    reader.onload=function(){
+
+      $("code").value=
+        reader.result;
+
+      updateCount();
+
+      toast(
+        "HTML file loaded"
+      );
+
+    };
+
+
+    reader.readAsText(file);
+
+  };
+
+
+  /* =========================
+     RENDER
+  ========================= */
+
+  function show(){
+
+    var c=
+      clean(
+        $("code").value
+      );
+
+
+    if(!c){
+
+      alert(
+        "Paste some code first."
+      );
+
+      return;
+
+    }
+
+
+    $("fr").srcdoc=c;
+
+
+    $("vt").textContent=
+      ($("date").value||"")
+      +" · "
+      +($("title").value||"Untitled");
+
+
+    $("edit")
+      .classList
+      .add("hide");
+
+
+    $("view")
+      .classList
+      .remove("hide");
+
+
+    window.scrollTo(
+      0,
+      0
+    );
+
+  }
+
+
+  /* =========================
+     SAVE
+  ========================= */
+
+  function save(){
+
+    var c=
+      clean(
+        $("code").value
+      );
+
+
+    if(!c){
+
+      alert(
+        "Nothing to save."
+      );
+
+      return;
+
+    }
+
+
+    var t=
+      $("title").value.trim()
+      ||
+      "Daily brief";
+
+
+    var d=
+      $("date").value.trim()
+      ||
+      today();
+
+
+    var ex=
+      items.filter(function(i){
+
+        return i.id===current;
+
+      })[0];
+
+
+    if(ex){
+
+      ex.title=t;
+
+      ex.date=d;
+
+      ex.code=c;
+
+      ex.ts=Date.now();
+
+    }
+
+    else{
+
+      var n={
+
+        id:"b"+Date.now(),
+
+        title:t,
+
+        date:d,
+
+        code:c,
+
+        ts:Date.now()
+
+      };
+
+
+      items.push(n);
+
+      current=n.id;
+
+    }
+
+
+    if(persist()){
+
+      render();
+
+      toast("Brief saved");
+
+    }
+
+  }
+
+
+  /* =========================
+     NEW
+  ========================= */
+
+  function fresh(){
+
+    current=null;
+
+    $("title").value="";
+
+    $("date").value=today();
+
+    $("code").value="";
+
+    updateCount();
+
+    $("view")
+      .classList
+      .add("hide");
+
+    $("edit")
+      .classList
+      .remove("hide");
+
+    render();
+
+    $("code").focus();
+
+  }
+
+
+  /* =========================
+     BUTTONS
+  ========================= */
+
+  $("show").onclick=show;
+
+  $("save").onclick=save;
+
+  $("savev").onclick=save;
+
+  $("new").onclick=fresh;
+
+
+  $("clear").onclick=function(){
+
+    if(
+      $("code").value &&
+      !confirm(
+        "Clear the current HTML?"
+      )
+    ){
+
+      return;
+
+    }
+
+    $("code").value="";
+
+    updateCount();
+
+    $("code").focus();
+
+  };
+
+
+  $("back").onclick=function(){
+
+    $("view")
+      .classList
+      .add("hide");
+
+    $("edit")
+      .classList
+      .remove("hide");
+
+  };
+
+
+  /* =========================
+     FULLSCREEN
+  ========================= */
+
+  $("full").onclick=function(){
+
+    var f=$("frame");
+
+    var on=
+      f.classList.toggle("full");
+
+
+    $("full").textContent=
+      on
+      ?"exit fullscreen"
+      :"fullscreen";
+
+
+    if(on){
+
+      var b=
+        document.createElement(
+          "button"
+        );
+
+      b.id="xf";
+
+      b.textContent="Exit";
+
+
+      b.style.cssText=
+        "position:fixed;"+
+        "right:12px;"+
+        "top:calc(env(safe-area-inset-top,0px) + 10px);"+
+        "z-index:10";
+
+
+      b.onclick=function(){
+
+        $("full").click();
+
+      };
+
+
+      document.body.appendChild(b);
+
+    }
+
+    else{
+
+      var e=$("xf");
+
+      if(e){
+
+        e.remove();
+
+      }
+
+    }
+
+  };
+
+
+  /* =========================
+     THEMES
+  ========================= */
+
+  var THEMES=[
+    "cyber",
+    "matrix",
+    "dracula",
+    "amber"
+  ];
+
+  var ti=0;
+
+
+  function setTheme(n){
+
+    ti=
+      Math.max(
+        0,
+        THEMES.indexOf(n)
+      );
+
+
+    var r=
+      document.documentElement;
+
+
+    if(ti===0){
+
+      r.removeAttribute(
+        "data-theme"
+      );
+
+    }
+
+    else{
+
+      r.setAttribute(
+        "data-theme",
+        THEMES[ti]
+      );
+
+    }
+
+
+    $("theme").textContent=
+      "theme: "
+      +THEMES[ti];
+
+  }
+
+
+  $("theme").onclick=function(){
+
+    setTheme(
+      THEMES[
+        (ti+1)%THEMES.length
+      ]
+    );
+
+
+    try{
+
+      localStorage.setItem(
+        THEME,
+        THEMES[ti]
+      );
+
+    }catch(e){}
+
+  };
+
+
+  /* =========================
+     LOAD THEME
+  ========================= */
+
+  var st="";
+
+
+  try{
+
+    st=
+      localStorage.getItem(
+        THEME
+      )||"";
+
+  }catch(e){}
+
+
+  setTheme(st);
+
+
+  /* =========================
+     INITIALIZE
+  ========================= */
+
+  $("dd").textContent=today();
+
+  load();
+
+  $("date").value=today();
+
+  updateCount();
+
+  render();
+
+})();
+
+</script>
+
+</body>
+</html>
