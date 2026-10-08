@@ -1,95 +1,568 @@
 <!DOCTYPE html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Tech Feed</title>
+
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
 <style>
 :root{
---bg:#07060f;--card:#0e0b1c;--card2:#111022;--ink:#e8e9f7;
---mute:#777b9e;--line:#282341;--acc:#00f0ff;--acc2:#ff2bd6;
---warn:#ffe66d;--accink:#04060f;
---mono:"JetBrains Mono",monospace;--ui:"Inter",sans-serif;
+--bg:#07060f;
+--card:#0e0b1c;
+--card2:#111022;
+--ink:#e8e9f7;
+--mute:#777b9e;
+--line:#282341;
+--acc:#00f0ff;
+--acc2:#ff2bd6;
+--warn:#ffe66d;
+--accink:#04060f;
+--mono:"JetBrains Mono",monospace;
+--ui:"Inter",sans-serif;
 }
-:root[data-theme="matrix"]{--bg:#020a05;--card:#07130a;--card2:#0b1a0e;--ink:#bff5cf;--mute:#4b7a5a;--line:#0f2a17;--acc:#00ff66;--acc2:#b6ff00;--warn:#ffd60a;--accink:#021208}
-:root[data-theme="dracula"]{--bg:#15161f;--card:#1d1f2b;--card2:#232536;--ink:#f8f8f2;--mute:#7a82a8;--line:#2e3146;--acc:#bd93f9;--acc2:#ff79c6;--warn:#f1fa8c;--accink:#14111f}
-:root[data-theme="amber"]{--bg:#0c0905;--card:#15100a;--card2:#1b140a;--ink:#ffd9a0;--mute:#8a6a3a;--line:#2e2210;--acc:#ffb000;--acc2:#ff5a1f;--warn:#ffe08a;--accink:#130b00}
-:root[data-theme="ocean"]{--bg:#06121c;--card:#0a1d2b;--card2:#102738;--ink:#d9f3ff;--mute:#6f9eb5;--line:#1b3c50;--acc:#35c9ff;--acc2:#477bff;--warn:#ffe08a;--accink:#03111a}
-:root[data-theme="sunset"]{--bg:#1b0b12;--card:#28101b;--card2:#351522;--ink:#ffe7dc;--mute:#bd8190;--line:#512535;--acc:#ff8066;--acc2:#ffbd59;--warn:#ffe08a;--accink:#260b12}
-:root[data-theme="forest"]{--bg:#08110d;--card:#101e17;--card2:#17291f;--ink:#e0f4e5;--mute:#86a991;--line:#294735;--acc:#73e0a0;--acc2:#c5ef75;--warn:#f4dc7b;--accink:#07130b}
-:root[data-theme="light"]{--bg:#f3f6fb;--card:#fff;--card2:#e9eef7;--ink:#172033;--mute:#68758d;--line:#d3dceb;--acc:#2563eb;--acc2:#7c3aed;--warn:#b45309;--accink:#fff}
-:root[data-theme="rose"]{--bg:#190d16;--card:#251321;--card2:#321a2d;--ink:#ffe8f4;--mute:#bd8ba8;--line:#4b2942;--acc:#ff6fba;--acc2:#c084fc;--warn:#ffd166;--accink:#210916}
-:root[data-theme="slate"]{--bg:#10151d;--card:#191f2a;--card2:#222b38;--ink:#e7edf5;--mute:#94a3b8;--line:#354254;--acc:#a5b4fc;--acc2:#67e8f9;--warn:#fbbf24;--accink:#10151d}
-*{box-sizing:border-box}
-body{margin:0;color:var(--ink);font:14px/1.6 var(--ui);background-color:var(--bg);background-image:radial-gradient(circle at 8% -8%,color-mix(in srgb,var(--acc2) 24%,transparent),transparent 42%),radial-gradient(circle at 98% 2%,color-mix(in srgb,var(--acc) 20%,transparent),transparent 38%),linear-gradient(color-mix(in srgb,var(--acc) 7%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--acc) 7%,transparent) 1px,transparent 1px);background-size:auto,auto,32px 32px,32px 32px;background-attachment:fixed}
-header,.wrap{max-width:1300px;margin:auto;padding:16px 18px}
-.term,aside,.editor-shell,.bar input{background:var(--card);border:1px solid var(--line);border-radius:10px}
-.term{border-color:color-mix(in srgb,var(--acc) 35%,var(--line));box-shadow:0 0 40px -18px var(--acc);overflow:hidden}
-.tb{padding:8px 12px;border-bottom:1px solid var(--line);color:var(--mute);font:12px var(--mono)}
-.dots{color:#ff5f56;letter-spacing:5px}
-.tbody{padding:15px 16px 17px}
-h1{font:800 clamp(20px,4vw,30px)/1.3 var(--mono);margin:0;color:var(--acc)}
-h1 span{background:linear-gradient(90deg,var(--acc),var(--acc2));background-clip:text;color:transparent}
-.meta{font:12px var(--mono);color:var(--mute);margin-top:6px}
-.meta b{color:var(--warn)}
-.tools,.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.tools{padding-top:12px}
-.workflow-note{margin-top:14px;padding:12px 14px;border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line));border-radius:8px;background:color-mix(in srgb,var(--acc) 6%,var(--card2));color:var(--mute);font:12px/1.65 var(--ui)}
-.workflow-note strong{color:var(--ink)}
-.workflow-note ol{margin:7px 0 0;padding-left:20px}
-.workflow-note li{padding:2px 0}
-button{font:600 12px var(--mono);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:9px 13px;border-radius:6px;cursor:pointer;transition:.2s}
-button:before{content:"[ "}
-button:after{content:" ]"}
-button:hover{border-color:var(--acc);color:var(--acc);box-shadow:0 0 12px -4px var(--acc)}
-button.primary{background:linear-gradient(90deg,var(--acc),var(--acc2));color:var(--accink);border-color:transparent}
-.wrap{display:grid;grid-template-columns:250px minmax(0,1fr);gap:16px;padding-top:0}
-aside{padding:12px;align-self:start;max-height:75vh;overflow:auto}
-aside h2{font:600 12px var(--mono);color:var(--acc2);margin:0 0 8px}
-aside h2:before{content:"$ ls "}
-.item{display:flex;gap:6px;align-items:center;padding:7px 8px;border-radius:5px;cursor:pointer;font:12px var(--mono);overflow:hidden}
-.item span{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.item:hover,.item.on{color:var(--acc);background:var(--bg)}
-.item.on{box-shadow:inset 2px 0 var(--acc2)}
-.item .del{padding:2px 5px}
-main{min-width:0}
-.bar{margin-bottom:10px}
-.bar input{flex:1;min-width:140px;padding:10px 12px;color:var(--ink);font:14px var(--ui)}
-.bar input:focus{outline:1px solid var(--acc)}
-.editor-shell{overflow:hidden;background:linear-gradient(145deg,var(--card2),var(--card))}
-.editor-top,.editor-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 13px;border-bottom:1px solid var(--line);color:var(--mute);font:11px var(--mono)}
-.editor-bottom{border-top:1px solid var(--line);border-bottom:0}
-textarea{display:block;width:100%;height:50vh;min-height:300px;resize:vertical;padding:18px;background:transparent;border:0;outline:0;color:var(--ink);font:14px/1.7 var(--ui)}
-textarea::placeholder{color:var(--mute)}
-.actions{display:flex;gap:6px}
-.mini{padding:5px 8px;font:11px var(--ui)}
-.hint{font:11px/1.5 var(--mono);color:var(--mute);margin:10px 2px}
-.frame{background:#fff;border:1px solid var(--acc);border-radius:6px;overflow:hidden;box-shadow:0 0 28px -8px var(--acc)}
-iframe{width:100%;height:78vh;border:0;display:block;background:#fff}
-.frame.full{position:fixed;inset:0;z-index:9;border-radius:0}
-.frame.full iframe{height:100vh}
-.hide{display:none!important}
-.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--card);border:1px solid var(--acc);color:var(--acc);padding:10px 16px;border-radius:8px;z-index:100;display:none;font:12px var(--mono);max-width:90vw}
-.toast.show{display:block}
-@media(max-width:760px){.wrap{grid-template-columns:1fr}aside{max-height:none}.editor-bottom{align-items:flex-start;flex-direction:column}textarea{height:55vh}}
-@media(max-width:480px){header,.wrap{padding:10px}.tools button{flex:1}.bar input{flex-basis:100%}.actions{flex-wrap:wrap}}
+
+:root[data-theme="matrix"]{
+--bg:#020a05;
+--card:#07130a;
+--card2:#0b1a0e;
+--ink:#bff5cf;
+--mute:#4b7a5a;
+--line:#0f2a17;
+--acc:#00ff66;
+--acc2:#b6ff00;
+--warn:#ffd60a;
+--accink:#021208
+}
+
+:root[data-theme="dracula"]{
+--bg:#15161f;
+--card:#1d1f2b;
+--card2:#232536;
+--ink:#f8f8f2;
+--mute:#7a82a8;
+--line:#2e3146;
+--acc:#bd93f9;
+--acc2:#ff79c6;
+--warn:#f1fa8c;
+--accink:#14111f
+}
+
+:root[data-theme="amber"]{
+--bg:#0c0905;
+--card:#15100a;
+--card2:#1b140a;
+--ink:#ffd9a0;
+--mute:#8a6a3a;
+--line:#2e2210;
+--acc:#ffb000;
+--acc2:#ff5a1f;
+--warn:#ffe08a;
+--accink:#130b00
+}
+
+:root[data-theme="ocean"]{
+--bg:#06121c;
+--card:#0a1d2b;
+--card2:#102738;
+--ink:#d9f3ff;
+--mute:#6f9eb5;
+--line:#1b3c50;
+--acc:#35c9ff;
+--acc2:#477bff;
+--warn:#ffe08a;
+--accink:#03111a
+}
+
+:root[data-theme="sunset"]{
+--bg:#1b0b12;
+--card:#28101b;
+--card2:#351522;
+--ink:#ffe7dc;
+--mute:#bd8190;
+--line:#512535;
+--acc:#ff8066;
+--acc2:#ffbd59;
+--warn:#ffe08a;
+--accink:#260b12
+}
+
+:root[data-theme="forest"]{
+--bg:#08110d;
+--card:#101e17;
+--card2:#17291f;
+--ink:#e0f4e5;
+--mute:#86a991;
+--line:#294735;
+--acc:#73e0a0;
+--acc2:#c5ef75;
+--warn:#f4dc7b;
+--accink:#07130b
+}
+
+:root[data-theme="light"]{
+--bg:#f3f6fb;
+--card:#fff;
+--card2:#e9eef7;
+--ink:#172033;
+--mute:#68758d;
+--line:#d3dceb;
+--acc:#2563eb;
+--acc2:#7c3aed;
+--warn:#b45309;
+--accink:#fff
+}
+
+:root[data-theme="rose"]{
+--bg:#190d16;
+--card:#251321;
+--card2:#321a2d;
+--ink:#ffe8f4;
+--mute:#bd8ba8;
+--line:#4b2942;
+--acc:#ff6fba;
+--acc2:#c084fc;
+--warn:#ffd166;
+--accink:#210916
+}
+
+:root[data-theme="slate"]{
+--bg:#10151d;
+--card:#191f2a;
+--card2:#222b38;
+--ink:#e7edf5;
+--mute:#94a3b8;
+--line:#354254;
+--acc:#a5b4fc;
+--acc2:#67e8f9;
+--warn:#fbbf24;
+--accink:#10151d
+}
+
+*{
+box-sizing:border-box
+}
+
+html{
+scroll-behavior:smooth
+}
+
+body{
+margin:0;
+color:var(--ink);
+font:14px/1.6 var(--ui);
+background-color:var(--bg);
+background-image:
+radial-gradient(circle at 8% -8%,color-mix(in srgb,var(--acc2) 24%,transparent),transparent 42%),
+radial-gradient(circle at 98% 2%,color-mix(in srgb,var(--acc) 20%,transparent),transparent 38%),
+linear-gradient(color-mix(in srgb,var(--acc) 7%,transparent) 1px,transparent 1px),
+linear-gradient(90deg,color-mix(in srgb,var(--acc) 7%,transparent) 1px,transparent 1px);
+background-size:auto,auto,32px 32px,32px 32px;
+background-attachment:fixed
+}
+
+header,.wrap{
+max-width:1300px;
+margin:auto;
+padding:16px 18px
+}
+
+.term,aside,.editor-shell,.bar input{
+background:var(--card);
+border:1px solid var(--line);
+border-radius:10px
+}
+
+.term{
+border-color:color-mix(in srgb,var(--acc) 35%,var(--line));
+box-shadow:0 0 40px -18px var(--acc);
+overflow:hidden
+}
+
+.tb{
+padding:8px 12px;
+border-bottom:1px solid var(--line);
+color:var(--mute);
+font:12px var(--mono)
+}
+
+.dots{
+color:#ff5f56;
+letter-spacing:5px
+}
+
+.tbody{
+padding:15px 16px 17px
+}
+
+h1{
+font:800 clamp(20px,4vw,30px)/1.3 var(--mono);
+margin:0;
+color:var(--acc)
+}
+
+h1 span{
+background:linear-gradient(90deg,var(--acc),var(--acc2));
+background-clip:text;
+color:transparent
+}
+
+.meta{
+font:12px var(--mono);
+color:var(--mute);
+margin-top:6px
+}
+
+.meta b{
+color:var(--warn)
+}
+
+.tools,.bar{
+display:flex;
+gap:8px;
+flex-wrap:wrap;
+align-items:center
+}
+
+.tools{
+padding-top:12px
+}
+
+.workflow-note{
+margin-top:14px;
+padding:12px 14px;
+border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line));
+border-radius:8px;
+background:color-mix(in srgb,var(--acc) 6%,var(--card2));
+color:var(--mute);
+font:12px/1.65 var(--ui)
+}
+
+.workflow-note strong{
+color:var(--ink)
+}
+
+.workflow-note ol{
+margin:7px 0 0;
+padding-left:20px
+}
+
+.workflow-note li{
+padding:2px 0
+}
+
+button{
+font:600 12px var(--mono);
+border:1px solid var(--line);
+background:var(--card);
+color:var(--ink);
+padding:9px 13px;
+border-radius:6px;
+cursor:pointer;
+transition:.2s
+}
+
+button:before{
+content:"[ "
+}
+
+button:after{
+content:" ]"
+}
+
+button:hover{
+border-color:var(--acc);
+color:var(--acc);
+box-shadow:0 0 12px -4px var(--acc)
+}
+
+button.primary{
+background:linear-gradient(90deg,var(--acc),var(--acc2));
+color:var(--accink);
+border-color:transparent
+}
+
+.wrap{
+display:grid;
+grid-template-columns:250px minmax(0,1fr);
+gap:16px;
+padding-top:0
+}
+
+aside{
+padding:12px;
+align-self:start;
+max-height:75vh;
+overflow:auto
+}
+
+aside h2{
+font:600 12px var(--mono);
+color:var(--acc2);
+margin:0 0 8px
+}
+
+aside h2:before{
+content:"$ ls "
+}
+
+.item{
+display:flex;
+gap:6px;
+align-items:center;
+padding:7px 8px;
+border-radius:5px;
+cursor:pointer;
+font:12px var(--mono);
+overflow:hidden
+}
+
+.item span{
+flex:1;
+overflow:hidden;
+text-overflow:ellipsis;
+white-space:nowrap
+}
+
+.item:hover,.item.on{
+color:var(--acc);
+background:var(--bg)
+}
+
+.item.on{
+box-shadow:inset 2px 0 var(--acc2)
+}
+
+.item .del{
+padding:2px 5px
+}
+
+main{
+min-width:0
+}
+
+.bar{
+margin-bottom:10px
+}
+
+.bar input{
+flex:1;
+min-width:140px;
+padding:10px 12px;
+color:var(--ink);
+font:14px var(--ui)
+}
+
+.bar input:focus{
+outline:1px solid var(--acc)
+}
+
+.editor-shell{
+overflow:hidden;
+background:linear-gradient(145deg,var(--card2),var(--card))
+}
+
+.editor-top,.editor-bottom{
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px;
+padding:10px 13px;
+border-bottom:1px solid var(--line);
+color:var(--mute);
+font:11px var(--mono)
+}
+
+.editor-bottom{
+border-top:1px solid var(--line);
+border-bottom:0
+}
+
+textarea{
+display:block;
+width:100%;
+height:50vh;
+min-height:300px;
+resize:vertical;
+padding:18px;
+background:transparent;
+border:0;
+outline:0;
+color:var(--ink);
+font:14px/1.7 var(--ui)
+}
+
+textarea::placeholder{
+color:var(--mute)
+}
+
+.actions{
+display:flex;
+gap:6px
+}
+
+.mini{
+padding:5px 8px;
+font:11px var(--ui)
+}
+
+.hint{
+font:11px/1.5 var(--mono);
+color:var(--mute);
+margin:10px 2px
+}
+
+.frame{
+background:#fff;
+border:1px solid var(--acc);
+border-radius:6px;
+overflow:hidden;
+box-shadow:0 0 28px -8px var(--acc);
+position:relative
+}
+
+iframe{
+width:100%;
+height:78vh;
+border:0;
+display:block;
+background:#fff
+}
+
+.frame.full{
+position:fixed;
+inset:0;
+z-index:9999;
+border-radius:0;
+width:100vw;
+height:100vh
+}
+
+.frame.full iframe{
+height:100vh
+}
+
+/* Dedicated fullscreen exit button */
+.exit-fullscreen{
+position:fixed;
+top:18px;
+right:18px;
+z-index:10001;
+display:none;
+background:var(--card);
+border:1px solid var(--acc);
+color:var(--acc);
+box-shadow:0 0 18px -5px var(--acc);
+}
+
+.frame.full + .exit-fullscreen{
+display:block
+}
+
+.hide{
+display:none!important
+}
+
+.toast{
+position:fixed;
+bottom:24px;
+left:50%;
+transform:translateX(-50%);
+background:var(--card);
+border:1px solid var(--acc);
+color:var(--acc);
+padding:10px 16px;
+border-radius:8px;
+z-index:10000;
+display:none;
+font:12px var(--mono);
+max-width:90vw
+}
+
+.toast.show{
+display:block
+}
+
+@media(max-width:760px){
+.wrap{
+grid-template-columns:1fr
+}
+
+aside{
+max-height:none
+}
+
+.editor-bottom{
+align-items:flex-start;
+flex-direction:column
+}
+
+textarea{
+height:55vh
+}
+}
+
+@media(max-width:480px){
+header,.wrap{
+padding:10px
+}
+
+.tools button{
+flex:1
+}
+
+.bar input{
+flex-basis:100%
+}
+
+.actions{
+flex-wrap:wrap
+}
+
+.exit-fullscreen{
+top:10px;
+right:10px
+}
+}
 </style>
+
 </head>
+
 <body>
+
 <header>
 <div class="term">
-<div class="tb"><span class="dots">● ● ●</span> &nbsp; tech-feed — zsh</div>
+
+<div class="tb">
+<span class="dots">● ● ●</span>
+&nbsp; tech-feed — zsh
+</div>
+
 <div class="tbody">
-<h1><span>~/tech-feed $</span> ./read --today <b>▌</b></h1>
-<div class="meta">date=<b id="today"></b> &nbsp;|&nbsp; briefs=<b id="count">0</b> &nbsp;|&nbsp; storage=local</div>
+
+<h1>
+<span>~/tech-feed $</span> ./read --today <b>▌</b>
+</h1>
+
+<div class="meta">
+date=<b id="today"></b>
+&nbsp;|&nbsp;
+briefs=<b id="count">0</b>
+&nbsp;|&nbsp;
+storage=local
+</div>
+
 <div class="tools">
 <button class="primary" id="new">new brief</button>
 <button id="theme">theme: cyber</button>
 <button id="prompt">prompt</button>
 </div>
+
 <div class="workflow-note">
 <strong>How to use this tool:</strong>
+
 <ol>
 <li>Choose the edition date in the editor.</li>
 <li>Click <strong>prompt</strong> to generate and copy the research prompt, then paste it into ChatGPT.</li>
@@ -97,46 +570,117 @@ iframe{width:100%;height:78vh;border:0;display:block;background:#fff}
 <li>Copy the full HTML response and paste it into the editor below.</li>
 <li>Click <strong>run / render</strong> to view the dashboard. Use <strong>save</strong> to keep it in this browser.</li>
 </ol>
+
 </div>
+
 </div>
 </div>
 </header>
 
 <div class="wrap">
-<aside><h2>briefs/</h2><div id="list"></div></aside>
+
+<aside>
+
+<h2>briefs/</h2>
+
+<div id="list"></div>
+
+</aside>
+
 <main>
+
 <section id="editor">
+
 <div class="bar">
+
 <input id="title" placeholder="Title e.g. ai-news">
+
 <input id="date" type="date" aria-label="Date">
+
 </div>
+
 <div class="editor-shell" id="shell">
-<div class="editor-top"><span>● Paste HTML Brief</span><div class="actions">
+
+<div class="editor-top">
+
+<span>● Paste HTML Brief</span>
+
+<div class="actions">
+
 <button class="mini" id="paste">Paste</button>
+
 <button class="mini" id="open">Open HTML</button>
+
 <input id="file" type="file" accept=".html,.htm,text/html" hidden>
-</div></div>
+
+</div>
+
+</div>
+
 <textarea id="code" spellcheck="false" placeholder="Paste your complete HTML brief here..."></textarea>
-<div class="editor-bottom"><span id="status">Ready</span><span><b id="chars">0</b> characters</span></div>
+
+<div class="editor-bottom">
+
+<span id="status">Ready</span>
+
+<span>
+<b id="chars">0</b> characters
+</span>
+
 </div>
+
+</div>
+
 <div class="bar" style="margin-top:10px">
+
 <button class="primary" id="run">run / render</button>
+
 <button id="save">save</button>
+
 <button id="clear">clear</button>
+
 </div>
-<p class="hint">// Paste complete HTML generated by ChatGPT. Code fences are automatically removed.</p>
+
+<p class="hint">
+// Paste complete HTML generated by ChatGPT. Code fences are automatically removed.
+</p>
+
 </section>
 
 <section id="viewer" class="hide">
+
 <div class="bar">
+
 <button id="back">back to editor</button>
+
 <button id="saveView">save</button>
+
 <button id="full">fullscreen</button>
+
 <span id="viewTitle" class="hint"></span>
+
 </div>
-<div class="frame" id="frame"><iframe id="preview" sandbox="allow-scripts allow-popups" title="Tech Feed Brief"></iframe></div>
-<p class="hint">// Remote images and fonts may depend on network access.</p>
+
+<div class="frame" id="frame">
+
+<iframe
+id="preview"
+sandbox="allow-scripts allow-popups"
+title="Tech Feed Brief">
+</iframe>
+
+</div>
+
+<!-- NEW: dedicated exit fullscreen button -->
+
+<button id="exitFull" class="exit-fullscreen">exit fullscreen</button>
+
+<p class="hint">
+// Remote images and fonts may depend on network access.
+</p>
+
 </section>
+
 </main>
 </div>
 
@@ -146,198 +690,498 @@ iframe{width:100%;height:78vh;border:0;display:block;background:#fff}
 (function(){
 "use strict";
 
-const $=id=>document.getElementById(id);
-const STORAGE="dailyBriefs.v1",THEME_KEY="dailyBriefs.theme";
-const themes=["cyber","matrix","dracula","amber","ocean","sunset","forest","light","rose","slate"];
-let themeIndex=0,items=[],current=null,timer;
+const $ = id => document.getElementById(id);
+
+const STORAGE = "dailyBriefs.v1";
+const THEME_KEY = "dailyBriefs.theme";
+
+const themes = [
+"cyber",
+"matrix",
+"dracula",
+"amber",
+"ocean",
+"sunset",
+"forest",
+"light",
+"rose",
+"slate"
+];
+
+let themeIndex = 0;
+let items = [];
+let current = null;
+let timer;
+
+/* =========================
+   DATE
+========================= */
 
 function today(){
-const d=new Date();
-return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");
+const d = new Date();
+
+return d.getFullYear() +
+"-" +
+String(d.getMonth()+1).padStart(2,"0") +
+"-" +
+String(d.getDate()).padStart(2,"0");
 }
+
+/* =========================
+   TOAST
+========================= */
 
 function notify(msg){
-const t=$("toast");
-t.textContent=msg;
+
+const t = $("toast");
+
+t.textContent = msg;
+
 t.classList.add("show");
+
 clearTimeout(timer);
-timer=setTimeout(()=>t.classList.remove("show"),2200);
+
+timer = setTimeout(() => {
+t.classList.remove("show");
+},2200);
+
 }
+
+/* =========================
+   CLEAN HTML
+========================= */
 
 function clean(s){
-s=s.trim();
-const m=s.match(/^```(?:html)?\s*([\s\S]*?)\s*```$/i);
-return m?m[1].trim():s;
+
+s = String(s || "").trim();
+
+/*
+FIX:
+The original regex contained broken escaped characters.
+This correctly removes Markdown HTML code fences.
+*/
+
+const m = s.match(/^```(?:html)?\s*([\s\S]*?)\s*```$/i);
+
+return m ? m[1].trim() : s;
+
 }
+
+/* =========================
+   LOAD SAVED BRIEFS
+========================= */
 
 function load(){
+
 try{
-items=JSON.parse(localStorage.getItem(STORAGE)||"[]")||[];
+
+items = JSON.parse(
+localStorage.getItem(STORAGE) || "[]"
+) || [];
+
+if(!Array.isArray(items)){
+items = [];
+}
+
 }catch(e){
-items=[];
+
+console.error("Could not load saved briefs:",e);
+
+items = [];
+
 }
+
 }
+
+/* =========================
+   SAVE STORAGE
+========================= */
 
 function persist(){
+
 try{
-localStorage.setItem(STORAGE,JSON.stringify(items));
+
+localStorage.setItem(
+STORAGE,
+JSON.stringify(items)
+);
+
 return true;
+
 }catch(e){
+
+console.error("Storage error:",e);
+
 alert("Could not save in this browser.");
+
 return false;
+
 }
+
 }
+
+/* =========================
+   CHARACTER COUNT
+========================= */
 
 function updateCount(){
-$("chars").textContent=$("code").value.length.toLocaleString();
-$("status").textContent=$("code").value.trim()?"Ready to render":"Waiting for HTML";
+
+const value = $("code").value;
+
+$("chars").textContent =
+value.length.toLocaleString();
+
+$("status").textContent =
+value.trim()
+? "Ready to render"
+: "Waiting for HTML";
+
 }
 
+/* =========================
+   RENDER SAVED LIST
+========================= */
+
 function renderList(){
-$("count").textContent=items.length;
-const list=$("list");
+
+$("count").textContent = items.length;
+
+const list = $("list");
+
 list.replaceChildren();
 
 if(!items.length){
-const empty=document.createElement("div");
-empty.className="hint";
-empty.textContent="No briefs saved yet";
+
+const empty = document.createElement("div");
+
+empty.className = "hint";
+
+empty.textContent = "No briefs saved yet";
+
 list.append(empty);
+
 return;
+
 }
 
-items.slice().sort((a,b)=>b.date.localeCompare(a.date)||b.ts-a.ts).forEach(it=>{
-const row=document.createElement("div");
-row.className="item"+(current===it.id?" on":"");
+items
+.slice()
+.sort((a,b) =>
+b.date.localeCompare(a.date) ||
+b.ts - a.ts
+)
+.forEach(it => {
 
-const label=document.createElement("span");
-label.textContent=it.date+" · "+it.title;
+const row = document.createElement("div");
 
-const del=document.createElement("button");
-del.className="del";
-del.textContent="×";
-del.title="Delete brief";
+row.className =
+"item" +
+(current === it.id ? " on" : "");
 
-del.onclick=e=>{
+const label =
+document.createElement("span");
+
+label.textContent =
+it.date + " · " + it.title;
+
+const del =
+document.createElement("button");
+
+del.className = "del";
+
+del.textContent = "×";
+
+del.title = "Delete brief";
+
+/* =========================
+   DELETE FIX
+========================= */
+
+del.onclick = function(e){
+
 e.stopPropagation();
-if(confirm("Delete this brief?")){
-items=items.filter(x=>x.id!==it.id);
-if(current===it.id)current=null;
-persist();
-renderList();
-notify("Brief deleted");
-}
-};
 
-row.onclick=()=>{
-current=it.id;
-$("title").value=it.title;
-$("date").value=it.date;
-$("code").value=it.code;
-updateCount();
-renderList();
-show();
-};
-
-row.append(label,del);
-list.append(row);
-});
-}
-
-function show(){
-const html=clean($("code").value);
-if(!html){
-alert("Paste some code first.");
+if(!confirm("Delete this brief?")){
 return;
 }
 
-$("preview").srcdoc=html;
-$("viewTitle").textContent=($("date").value||"")+" · "+($("title").value||"Untitled");
-$("editor").classList.add("hide");
-$("viewer").classList.remove("hide");
-window.scrollTo(0,0);
-}
+items = items.filter(
+x => x.id !== it.id
+);
 
-function save(){
-const code=clean($("code").value);
-if(!code){
-alert("Nothing to save.");
-return;
-}
-
-const title=$("title").value.trim()||"Daily brief";
-const date=$("date").value||today();
-const existing=items.find(x=>x.id===current);
-
-if(existing){
-existing.title=title;
-existing.date=date;
-existing.code=code;
-existing.ts=Date.now();
-}else{
-const item={id:"b"+Date.now(),title,date,code,ts:Date.now()};
-items.push(item);
-current=item.id;
+if(current === it.id){
+current = null;
 }
 
 if(persist()){
+
 renderList();
-notify("Brief saved");
-}
-}
 
-function fresh(){
-current=null;
-$("title").value="";
-$("date").value=today();
-$("code").value="";
-$("viewer").classList.add("hide");
-$("editor").classList.remove("hide");
-updateCount();
-renderList();
-$("code").focus();
+notify("Brief deleted");
+
 }
 
-function setTheme(name){
-const i=themes.indexOf(name);
-themeIndex=i<0?0:i;
-
-if(themeIndex===0){
-document.documentElement.removeAttribute("data-theme");
-}else{
-document.documentElement.setAttribute("data-theme",themes[themeIndex]);
-}
-
-$("theme").textContent="theme: "+themes[themeIndex];
-
-try{
-localStorage.setItem(THEME_KEY,themes[themeIndex]);
-}catch(e){}
-}
-
-$("theme").onclick=()=>{
-setTheme(themes[(themeIndex+1)%themes.length]);
 };
 
-/* PROMPT BUTTON: builds and copies a reusable daily research prompt */
-$("prompt").onclick=async()=>{
-const date=$("date").value||today();
-const [y,m,d]=date.split("-").map(Number);
+/* =========================
+   OPEN SAVED BRIEF
+========================= */
 
-const edition=new Date(y,m-1,d).toLocaleDateString("en-US",{
+row.onclick = function(){
+
+current = it.id;
+
+$("title").value = it.title;
+
+$("date").value = it.date;
+
+$("code").value = it.code;
+
+updateCount();
+
+renderList();
+
+show();
+
+};
+
+row.append(label,del);
+
+list.append(row);
+
+});
+
+}
+
+/* =========================
+   SHOW / RENDER
+========================= */
+
+function show(){
+
+const html = clean(
+$("code").value
+);
+
+if(!html){
+
+alert("Paste some code first.");
+
+return;
+
+}
+
+$("preview").srcdoc = html;
+
+$("viewTitle").textContent =
+($("date").value || "") +
+" · " +
+($("title").value || "Untitled");
+
+$("editor").classList.add("hide");
+
+$("viewer").classList.remove("hide");
+
+window.scrollTo(0,0);
+
+}
+
+/* =========================
+   SAVE BRIEF
+========================= */
+
+function save(){
+
+const code = clean(
+$("code").value
+);
+
+if(!code){
+
+alert("Nothing to save.");
+
+return;
+
+}
+
+const title =
+$("title").value.trim() ||
+"Daily brief";
+
+const date =
+$("date").value ||
+today();
+
+const existing =
+items.find(x => x.id === current);
+
+/*
+If editing an existing saved brief,
+update it.
+*/
+
+if(existing){
+
+existing.title = title;
+
+existing.date = date;
+
+existing.code = code;
+
+existing.ts = Date.now();
+
+}else{
+
+/*
+Create new saved brief.
+*/
+
+const item = {
+
+id: "b" + Date.now(),
+
+title: title,
+
+date: date,
+
+code: code,
+
+ts: Date.now()
+
+};
+
+items.push(item);
+
+current = item.id;
+
+}
+
+if(persist()){
+
+renderList();
+
+notify("Brief saved");
+
+}
+
+}
+
+/* =========================
+   NEW BRIEF
+========================= */
+
+function fresh(){
+
+current = null;
+
+$("title").value = "";
+
+$("date").value = today();
+
+$("code").value = "";
+
+$("viewer").classList.add("hide");
+
+$("editor").classList.remove("hide");
+
+updateCount();
+
+renderList();
+
+$("code").focus();
+
+}
+
+/* =========================
+   THEMES
+========================= */
+
+function setTheme(name){
+
+const i = themes.indexOf(name);
+
+themeIndex = i < 0 ? 0 : i;
+
+if(themeIndex === 0){
+
+document.documentElement
+.removeAttribute("data-theme");
+
+}else{
+
+document.documentElement
+.setAttribute(
+"data-theme",
+themes[themeIndex]
+);
+
+}
+
+$("theme").textContent =
+"theme: " + themes[themeIndex];
+
+try{
+
+localStorage.setItem(
+THEME_KEY,
+themes[themeIndex]
+);
+
+}catch(e){
+
+console.warn("Could not save theme:",e);
+
+}
+
+}
+
+$("theme").onclick = function(){
+
+setTheme(
+themes[
+(themeIndex + 1) % themes.length
+]
+);
+
+};
+
+/* =========================
+   PROMPT BUTTON
+========================= */
+
+$("prompt").onclick = async function(){
+
+const date =
+$("date").value || today();
+
+const [y,m,d] =
+date.split("-").map(Number);
+
+const edition =
+new Date(
+y,
+m-1,
+d
+).toLocaleDateString(
+"en-US",
+{
 year:"numeric",
 month:"long",
 day:"numeric"
-});
+}
+);
 
-const theme=themes[themeIndex];
+const theme =
+themes[themeIndex];
 
-const prompt=`You are an evidence-first technology intelligence researcher, editorial designer, and expert front-end engineer.
+const prompt = `You are an evidence-first technology intelligence researcher, editorial designer, and expert front-end engineer.
 
 TASK
+
 Create a complete, polished, standalone Technology Intelligence HTML dashboard for the selected edition date: ${edition}. The result must closely reproduce the exact visual language, layout, section order, image-led editorial design, and interactions described below. This is not a generic news website and must not be simplified into a plain list of cards.
 
 EDITION AND RESEARCH RULES
+
 - Edition date: ${edition}.
 - Research technology news published on or materially updated for that date. Clearly distinguish publication date from the date an event happened.
 - Focus on the most important developments around AI, semiconductors, chips, GPUs, HBM, advanced packaging, compute, data centres, cloud, AI agents, telecom, 5G/6G, electronics, Indian technology, developer tools, open source, and future technology.
@@ -348,7 +1192,9 @@ EDITION AND RESEARCH RULES
 - If reliable research is unavailable, do not fabricate current news. Clearly reflect uncertainty in the page.
 
 EXACT VISUAL DIRECTION — FOLLOW CLOSELY
+
 Recreate a premium, cinematic, futuristic editorial dashboard inspired by a high-end technology intelligence terminal:
+
 - Overall background: extremely dark near-black/navy (#03040a, #070a12 range), with subtle fine grid lines, layered radial glow, and restrained atmospheric gradients.
 - Main accent palette: luminous cyan (#54f7ff), violet/purple (#9b6cff), and hot pink (#ff55d8), with restrained green, yellow, and red for status or signal labels.
 - Use Inter for body copy and Space Grotesk for display headings where available. Use strong, oversized editorial typography, compact uppercase eyebrow labels, tracked-out metadata, and crisp readable text.
@@ -363,14 +1209,25 @@ Recreate a premium, cinematic, futuristic editorial dashboard inspired by a high
 - The selected editor theme is ${theme}. Keep the reference's near-black futuristic layout and cyan/purple/pink editorial identity as the primary design. The selected theme may only subtly influence accent details; it must not replace the reference design with a different generic palette.
 
 IMAGE REQUIREMENTS
+
 Use image-led cards and feature panels as in the reference. Use these exact image URLs in the matching sections where appropriate, preserving their URLs and crop treatment:
-1. Network / data-centre networking feature: https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=85
-2. Electronics / modern laptop card: https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85
-3. Electronics / laptop technology card: https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=85
-4. India technology feature: https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=85
+
+1. Network / data-centre networking feature:
+https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=85
+
+2. Electronics / modern laptop card:
+https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=1200&q=85
+
+3. Electronics / laptop technology card:
+https://images.unsplash.com/photo-1496181133206-80ce9b88a853?auto=format&fit=crop&w=1200&q=85
+
+4. India technology feature:
+https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&w=1400&q=85
+
 Use additional relevant, stable remote image URLs for Chips, AI, Compute, and other image-led stories. Choose imagery that actually matches each story (semiconductor wafers/chips, GPU/data centres, AI systems, networking hardware, electronics). Do not reuse the same image repeatedly when different relevant images are available. Use descriptive alt text, loading="lazy" below the hero, and onerror fallback behavior. Do not replace the above exact URLs with unrelated images.
 
 REQUIRED PAGE STRUCTURE AND ORDER
+
 Create all of the following in one continuous dashboard, in this order. Include the navigation, anchor IDs, and matching sections so every navigation link works.
 
 A. HEADER / NAVIGATION
@@ -445,6 +1302,7 @@ O. FOOTER
 - Small topic line such as AI • SEMICONDUCTORS • COMPUTE • NETWORKS • INDIA.
 
 CONTENT AND COMPONENT DETAILS
+
 - Keep the editorial hierarchy close to the reference: section number/eyebrow, large section title, short right-side/adjacent description, then feature/grid/pipeline as appropriate.
 - Cards should have clear numbered markers where the reference uses them, compact category tags, strong headings, concise summaries, and source metadata.
 - Feature layouts should place image and text side by side on desktop and stack gracefully on mobile.
@@ -454,17 +1312,19 @@ CONTENT AND COMPONENT DETAILS
 - Include the exact section names and the full set of structural elements above. Do not omit sections because the edition is quiet; instead explain the absence of a major verified development and provide useful context without inventing a story.
 
 TECHNICAL REQUIREMENTS
+
 - Return a single complete HTML document, starting with <!DOCTYPE html> and ending with </html>.
 - Put all CSS inside one or more <style> tags and all JavaScript inside <script> tags in the same HTML file.
 - No React, build tools, backend, API key, or external JavaScript framework.
 - External font loading is allowed, with sensible system-font fallbacks.
 - Use semantic HTML, accessible navigation labels, meaningful image alt text, keyboard-friendly controls, and adequate contrast.
-- Implement functional smooth navigation to the real section IDs, active-section highlighting, reveal-on-scroll, reading-progress bar, image fallback, and restrained card tilt/hover behavior if enabled.
+- Implement functional smooth navigation to the real section IDs, active-section highlighting, reveal-on-scroll, reading-progress, image fallback, and restrained card tilt/hover behavior if enabled.
 - Keep animations performant and disable or reduce them when prefers-reduced-motion is enabled.
 - Ensure there are no missing closing tags, broken selectors, JavaScript errors, dead navigation links, fake controls, or horizontal overflow.
 - Avoid markdown code fences and do not write an explanation before or after the HTML.
 
 FINAL SELF-CHECK BEFORE OUTPUT
+
 1. All nine navigation sections exist and their links scroll to the correct IDs.
 2. The Bigger Picture table, Final 5 takeaways, Sources panel, and footer are present.
 3. Image-led layouts and the four specified exact image URLs are included.
@@ -473,138 +1333,398 @@ FINAL SELF-CHECK BEFORE OUTPUT
 6. The output is a complete, standalone, valid HTML page.
 
 Output ONLY the complete HTML document. No Markdown fences, no commentary, no summary.`;
-;
 
 try{
+
 await navigator.clipboard.writeText(prompt);
+
 notify("Daily brief prompt copied");
+
 }catch(e){
-const w=window.open("","_blank","width=760,height=650");
+
+const w = window.open(
+"",
+"_blank",
+"width=760,height=650"
+);
 
 if(!w){
-notify("Clipboard blocked. Select and copy the prompt manually.");
+
+notify(
+"Clipboard blocked. Select and copy the prompt manually."
+);
+
 return;
+
 }
 
-const safePrompt=prompt
+/*
+FIX:
+Correct HTML escaping for fallback prompt window.
+*/
+
+const safePrompt = prompt
 .replace(/&/g,"&amp;")
 .replace(/</g,"&lt;")
 .replace(/>/g,"&gt;");
 
 w.document.write(
-"<title>Daily Tech Feed Prompt</title>"+
-"<textarea style='box-sizing:border-box;width:100%;height:95vh;padding:16px;font:14px/1.6 monospace'>"+
-safePrompt+
+"<title>Daily Tech Feed Prompt</title>" +
+"<textarea style='box-sizing:border-box;width:100%;height:95vh;padding:16px;font:14px/1.6 monospace'>" +
+safePrompt +
 "</textarea>"
+
 );
+
 w.document.close();
+
 notify("Prompt opened in a new tab");
+
 }
+
 };
 
-$("new").onclick=fresh;
-$("run").onclick=show;
-$("save").onclick=save;
-$("saveView").onclick=save;
+/* =========================
+BUTTON EVENTS
+========================= */
 
-$("back").onclick=()=>{
+$("new").onclick = fresh;
+
+$("run").onclick = show;
+
+$("save").onclick = save;
+
+$("saveView").onclick = save;
+
+/* =========================
+BACK TO EDITOR
+========================= */
+
+$("back").onclick = function(){
+
 $("viewer").classList.add("hide");
+
 $("editor").classList.remove("hide");
+
+/* Make sure fullscreen is removed */
+exitFullscreen();
+
 };
 
-$("code").addEventListener("input",updateCount);
+/* =========================
+LIVE CHARACTER COUNT
+========================= */
 
-$("clear").onclick=()=>{
-if($("code").value&&!confirm("Clear the current HTML?"))return;
-$("code").value="";
+$("code").addEventListener(
+"input",
+updateCount
+);
+
+/* =========================
+CLEAR
+========================= */
+
+$("clear").onclick = function(){
+
+if(
+$("code").value &&
+!confirm("Clear the current HTML?")
+){
+return;
+}
+
+$("code").value = "";
+
+current = null;
+
 updateCount();
+
+renderList();
+
 $("code").focus();
+
+notify("Editor cleared");
+
 };
 
-$("open").onclick=()=>$("file").click();
+/* =========================
+OPEN HTML FILE
+========================= */
 
-$("file").onchange=e=>{
-const file=e.target.files[0];
-if(!file)return;
+$("open").onclick = function(){
 
-const reader=new FileReader();
-reader.onload=()=>{
-$("code").value=reader.result;
+$("file").click();
+
+};
+
+$("file").onchange = function(e){
+
+const file = e.target.files[0];
+
+if(!file){
+return;
+}
+
+const reader = new FileReader();
+
+reader.onload = function(){
+
+$("code").value =
+reader.result;
+
 updateCount();
+
 notify("HTML file loaded");
-};
-reader.readAsText(file);
-e.target.value="";
+
 };
 
-$("paste").onclick=async()=>{
+reader.onerror = function(){
+
+notify("Could not read HTML file");
+
+};
+
+reader.readAsText(file);
+
+e.target.value = "";
+
+};
+
+/* =========================
+PASTE
+========================= */
+
+$("paste").onclick = async function(){
+
 try{
-const text=await navigator.clipboard.readText();
+
+const text =
+await navigator.clipboard.readText();
 
 if(!text){
+
 notify("Clipboard is empty");
+
 return;
+
 }
 
-$("code").value=text;
+$("code").value = text;
+
 updateCount();
+
 notify("HTML pasted");
+
 }catch(e){
+
 $("code").focus();
+
 notify("Use Ctrl + V to paste");
+
 }
+
 };
 
-$("shell").addEventListener("dragover",e=>{
+/* =========================
+DRAG & DROP
+========================= */
+
+$("shell").addEventListener(
+"dragover",
+function(e){
+
 e.preventDefault();
-$("shell").style.borderColor="var(--acc)";
-});
 
-$("shell").addEventListener("dragleave",()=>{
-$("shell").style.borderColor="";
-});
+$("shell").style.borderColor =
+"var(--acc)";
 
-$("shell").addEventListener("drop",e=>{
+}
+);
+
+$("shell").addEventListener(
+"dragleave",
+function(){
+
+$("shell").style.borderColor = "";
+
+}
+);
+
+$("shell").addEventListener(
+"drop",
+function(e){
+
 e.preventDefault();
-$("shell").style.borderColor="";
 
-const file=e.dataTransfer.files[0];
-if(!file)return;
+$("shell").style.borderColor = "";
 
-if(!/\.(html?|txt)$/i.test(file.name)){
-notify("Please drop an HTML file");
+const file =
+e.dataTransfer.files[0];
+
+if(!file){
 return;
 }
 
-const reader=new FileReader();
-reader.onload=()=>{
-$("code").value=reader.result;
+/*
+FIX:
+Original file regex was malformed.
+*/
+
+if(!/.(html?|txt)$/i.test(file.name)){
+
+notify("Please drop an HTML file");
+
+return;
+
+}
+
+const reader =
+new FileReader();
+
+reader.onload = function(){
+
+$("code").value =
+reader.result;
+
 updateCount();
+
 notify("HTML file loaded");
+
 };
+
+reader.onerror = function(){
+
+notify("Could not read file");
+
+};
+
 reader.readAsText(file);
-});
 
-$("full").onclick=()=>{
-const frame=$("frame");
-const on=frame.classList.toggle("full");
-$("full").textContent=on?"exit fullscreen":"fullscreen";
+}
+);
+
+/* =========================
+FULLSCREEN
+========================= */
+
+function enterFullscreen(){
+
+const frame = $("frame");
+
+frame.classList.add("full");
+
+$("full").textContent =
+"exit fullscreen";
+
+$("exitFull").style.display =
+"block";
+
+document.body.style.overflow =
+"hidden";
+
+}
+
+/* =========================
+EXIT FULLSCREEN
+========================= */
+
+function exitFullscreen(){
+
+const frame = $("frame");
+
+frame.classList.remove("full");
+
+$("full").textContent =
+"fullscreen";
+
+$("exitFull").style.display =
+"none";
+
+document.body.style.overflow =
+"";
+
+}
+
+/* =========================
+FULLSCREEN TOGGLE
+========================= */
+
+$("full").onclick = function(){
+
+const frame = $("frame");
+
+if(frame.classList.contains("full")){
+
+exitFullscreen();
+
+}else{
+
+enterFullscreen();
+
+}
+
 };
 
-$("today").textContent=today();
-$("date").value=today();
+/* =========================
+DEDICATED EXIT BUTTON
+========================= */
+
+$("exitFull").onclick = function(){
+
+exitFullscreen();
+
+};
+
+/* =========================
+ESCAPE KEY
+========================= */
+
+document.addEventListener(
+"keydown",
+function(e){
+
+if(
+e.key === "Escape" &&
+$("frame").classList.contains("full")
+){
+
+exitFullscreen();
+
+}
+
+}
+);
+
+/* =========================
+INITIALIZATION
+========================= */
+
+$("today").textContent =
+today();
+
+$("date").value =
+today();
 
 load();
 
 try{
-setTheme(localStorage.getItem(THEME_KEY)||"cyber");
+
+setTheme(
+localStorage.getItem(THEME_KEY) ||
+"cyber"
+);
+
 }catch(e){
+
 setTheme("cyber");
+
 }
 
 updateCount();
+
 renderList();
-})();
-</script>
+
+})(); </script>
+
 </body>
 </html>
